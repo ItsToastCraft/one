@@ -32,6 +32,7 @@ function events.skull_render(delta, block, item, entity, ctx)
         else
             models.player.Skull.Player:setVisible(false)
             models.player.Skull.Server:setVisible(false)
+            models.player.Skull.Gear:setVisible(false)
         end
     end
 end

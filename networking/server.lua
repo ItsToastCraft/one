@@ -22,7 +22,9 @@ local id = 0
 local base64 = require("libs.base64")
 
 local unoServers = action_wheel:newPage()
-
+unoServers:newAction():setItem("minecraft:player_head[minecraft:profile=ItsToastCraft,minecraft:custom_data={type:server}]")
+unoServers:newAction():setItem("minecraft:player_head[minecraft:profile=ItsToastCraft,minecraft:custom_data={type:player}]")
+unoServers:newAction():setItem("minecraft:player_head[minecraft:profile=ItsToastCraft,minecraft:custom_data={type:gear}]")
 ---Takes the first 6 characters of the UUID and turns them into a 3 byte string
 ---@param uuid CompressedUUID
 ---@return string
@@ -124,43 +126,45 @@ local function addGame(data)
     if not data.serverID or not data.owner or not data.currentPlayers then return end
     if not world.avatarVars()[data.owner.uuid].UNO then return end 
     if #unoServers:getActions() > 7 then return end
-    if (foundServers[data.serverID]) then
-        ---@type Server
-        local serv = foundServers[data.serverID]
-        print("Already registered, updating...")
-        unoServers:getAction(serv.id):setTitle("     " ..data.owner.name .. "'s Server     \nPassword Needed: " .. tostring(data.needsPassword) .. ("\nPlayer Count : %d/%d "):format(count(data.currentPlayers), data.maxPlayers))
-        data.id = serv.id
-        serv = data
-    else
-    
-    id = id + 1
-    printJson(toJson({{text ="[uno] ", color = "red"},{text = data.owner.name .. " is hosting a game! Check your action wheel.\n", color = "white"}}))
-    
-    data.id = id
-    
-    foundServers[data.serverID] = data
-    unoServers:newAction(id)
-    :setTitle("     " ..data.owner.name .. "'s Server     \nPassword Needed: " .. tostring(data.needsPassword) .. ("\nPlayer Count : %d/%d "):format(count(data.currentPlayers), data.maxPlayers))
-    :setItem(("minecraft:player_head[profile=%s]"):format(data.owner.name))
-    :setOnLeftClick(function()
-        if data.needsPassword then
-            print("This game requires a password! Enter the password into chat")
-            waiting = true
-            host:setChatColor(vectors.hexToRGB("f5c029"))
-            events.tick:register(function ()
-                if pass ~= "" then
-                    
-                    pings.tryJoin(compressID(data.serverID), base64.encode(pass))
-                    pass = ""
-                    events.tick:remove("waitForPassword")
-                    host:setChatColor(vec(1,1,1))
-                    waiting = false
-                end
-            end, "waitForPassword")
-        else 
-            pings.tryJoin(compressID(data.serverID))
+    if host:isHost() then 
+        if (foundServers[data.serverID]) then
+            ---@type Server
+            local serv = foundServers[data.serverID]
+            print("Already registered, updating...")
+            unoServers:getAction(serv.id):setTitle("     " ..data.owner.name .. "'s Server     \nPassword Needed: " .. tostring(data.needsPassword) .. ("\nPlayer Count : %d/%d "):format(count(data.currentPlayers), data.maxPlayers))
+            data.id = serv.id
+            serv = data
+        else
+        
+        id = id + 1
+        printJson(toJson({{text ="[uno] ", color = "red"},{text = data.owner.name .. " is hosting a game! Check your action wheel.\n", color = "white"}}))
+        
+        data.id = id
+        
+        foundServers[data.serverID] = data
+        unoServers:newAction(id)
+        :setTitle("     " ..data.owner.name .. "'s Server     \nPassword Needed: " .. tostring(data.needsPassword) .. ("\nPlayer Count : %d/%d "):format(count(data.currentPlayers), data.maxPlayers))
+        :setItem(("minecraft:player_head[profile=%s]"):format(data.owner.name))
+        :setOnLeftClick(function()
+            if data.needsPassword then
+                print("This game requires a password! Enter the password into chat")
+                waiting = true
+                host:setChatColor(vectors.hexToRGB("f5c029"))
+                events.tick:register(function ()
+                    if pass ~= "" then
+                        
+                        pings.tryJoin(compressID(data.serverID), base64.encode(pass))
+                        pass = ""
+                        events.tick:remove("waitForPassword")
+                        host:setChatColor(vec(1,1,1))
+                        waiting = false
+                    end
+                end, "waitForPassword")
+            else 
+                pings.tryJoin(compressID(data.serverID))
+            end
+        end)
         end
-    end)
     end
 end
 
@@ -201,7 +205,7 @@ function pings.broadcast(data)
                         connect = server.connect
                     }, server)
                     if tostring(found.version) ~= server.version then 
-                        print(("Server provided different version (%d), while this script is on (%d)! Compatibility might be limited."):format(found.version, server.version))
+                        --print(("Server provided different version (%d), while this script is on (%d)! Compatibility might be limited."):format(found.version, server.version))
                     end
 
                     storedData.server = found

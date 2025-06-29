@@ -4,5 +4,6 @@
   "authors": [
     ""
   ],
+  "autoScripts": ["libs.utils", "networking.client", "networking.server"],
   "color": "#ff2400"
 }

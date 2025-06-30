@@ -5,7 +5,7 @@ local players = {}
 ---@param uuid CompressedUUID
 ---@return string
 function utils.compressUUID(uuid)
-    print(uuid)
+    
     if #uuid ~= 6 then uuid = uuid:sub(1,6) end
     local newID = tonumber(uuid, 16)
     local b1 = bit32.rshift(newID, 16)

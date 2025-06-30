@@ -49,7 +49,6 @@ end
 ---@param uuid UUID
 ---@param password string
 function server.connect(uuid,password)
-    print("trying to connect")
     if not hosted then return end
     local key = math.random(16777215)
 

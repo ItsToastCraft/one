@@ -92,7 +92,6 @@ end
 ---@param amount any
 function pings.tryDraw(server, amount)
     local gameHost = world.avatarVars()[utils.getPlayers()[server].uuid]
-    printTable(gameHost,2)
     if gameHost.UNO and gameHost.UNO.server then
         gameHost.UNO.server.requestDraw(uuid, amount)
     end
@@ -100,7 +99,6 @@ end
 ---Not meant to be called by clients, will mess stuff up.
 function unoClient.draw()
     if not connectedServer then return end
-    print("a")
     pings.tryDraw(utils.compressUUID(connectedServer.serverID), 20)
 end
 
@@ -111,7 +109,6 @@ end
 function unoClient.recieveAuth(server, key)
     connectedServer = discoveredServers[server]
     connectedServer.game.currentPlayers[uuid] = {name = avatar:getEntityName(), offset = tonumber(utils.decompressID(utils.xor(key, utils.compressUUID(uuid))),16), cards = {}}
-    printTable(connectedServer.game.currentPlayers, 2)
 end
 
 
